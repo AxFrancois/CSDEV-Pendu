@@ -8,6 +8,7 @@ Created on Sun Nov 29 12:10:36 2020
 #-------------------------Import----------------------------------------------#
 import csv
 import random
+import string
 
 
 #-------------------------Fonctions-------------------------------------------#
@@ -32,16 +33,14 @@ def fAjouteur(pMot, pLettreEntrée, pDisplay, pListeLettreDonnée,pVie):
     pListeLettreDonnée (liste) et pVie (int). La fonction retourne pDisplay 
     (str), pListeLettreDonnée (liste), et pVie (int)"""
     
-    if pLettreEntrée not in pMot:
-        pListeLettreDonnée.append(pLettreEntrée)
-        return pDisplay, pListeLettreDonnée,pVie-1
-    
-    pMot = list(pMot)
-    pDisplay = list(pDisplay)
-    for i in range(len(pMot)):
-        if pMot[i] == pLettreEntrée:
-            pDisplay[i] = pLettreEntrée
     pListeLettreDonnée.append(pLettreEntrée)
+    
+    if pLettreEntrée not in pMot:
+        return pDisplay, pListeLettreDonnée,pVie-1
+    pDisplay = list(pDisplay)
+    for i,lettre in enumerate(pMot):
+        if lettre == pLettreEntrée:
+            pDisplay[i] = pLettreEntrée
     pDisplay = ''.join(pDisplay)    
     
     return  pDisplay, pListeLettreDonnée, pVie
@@ -144,9 +143,8 @@ def fTour(pMot, pDisplay, pListeLettreDonnée,pVie):
     la valeur de Game (booléen, condition de sortie), pVie (int) et pDisplay 
     (str)"""
     
-    ListeLettre = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O',
-                   'P','Q','R','S','T','U','V','W','X','Y','Z']
-    
+    SetLettre = set(string.ascii_uppercase)
+
     fAfficher(pVie)
     
     if pVie == 0:    
@@ -157,7 +155,7 @@ def fTour(pMot, pDisplay, pListeLettreDonnée,pVie):
     print("\nEntrez votre lettre")
     NouvelleLettre = str(input()).upper()
     
-    if NouvelleLettre not in ListeLettre:
+    if NouvelleLettre not in SetLettre:
         print("Pas une lettre ou plusieurs caractères, recommencez")
         return True,pVie,pDisplay
     
@@ -185,7 +183,7 @@ ListeMot = lectureDonnee('Mot_Pendu.csv')
 
 while Play == True:
     """Initialisation de la partie"""    
-    Mot = ListeMot[random.randint(0,len(ListeMot)-1)]   #Choisi le mot
+    Mot = random.choice(ListeMot)  #Choisi le mot
     ListeLettreEntrée = []
     Display = "_"*len(Mot)
     Game = True
@@ -204,7 +202,7 @@ while Play == True:
         Winstreak = 0
     else:
         Winstreak +=1
-        print("Bravo, vous avez gagné ! Le mot était {}.".format(Mot), end ='')
+        print("Bravo, vous avez gagné ! Le mot était {}.".format(Mot),end =' ')
         print("Votre série de victoire est de {}.".format(Winstreak))
                 
     """Rejouer"""    
