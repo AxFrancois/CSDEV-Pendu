@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Dec  7 13:30:51 2020
+Created on Mon Dec 7 13:30:51 2020
 
 @author: Axel François
 
-En vrai, j'ai honte de rendre ce programme, il est tellement mal codé et necessite au moins 3 heures de travail de plus
+to do : rendre ça beau et débuguer la winstreak
+
+En vrai, j'ai honte de rendre ce programme, il est tellement mal codé et 
+necessite au moins 3 heures de travail de plus
 """
 
 #-------------------------Import----------------------------------------------#
 
-from tkinter import *
+from tkinter import Tk, Label, StringVar, Entry, Button, Canvas, PhotoImage
 from Fonctions import lectureDonnee, fAjouteur
 import random
 import string
@@ -18,32 +21,36 @@ import string
 #-------------------------Fonctions-------------------------------------------#
 
 def fTour():
-    global Mot, Display, ListeLettreEntrée, Vie, Winstreak
+    """Cette fonction s'occupe de chaque tour de jeu et est appellée par le
+    bouton valider"""
+    global Mot, Display, ListeLettreEntrée, Vie, Winstreak  #Les globals c'est moche mais pas le choix
     
     SetLettre = set(string.ascii_uppercase)
 
-    NouvelleLettre = str(Saisie.get()).upper()
+    NouvelleLettre = str(Saisie.get()).upper()  #Recupère la lettre
     
     if Vie == 0 or Display == Mot:    #Bloque le programme si le joueur n'a plus de vie ou le mot est trouvé
         return
     
-    if NouvelleLettre not in SetLettre:
+    if NouvelleLettre not in SetLettre: #Bloque le programme si la chaine de carractère mis en entrée n'est pas une lettre
         return
     
-    if NouvelleLettre not in Mot and NouvelleLettre not in ListeLettreEntrée:
-        Vie -= 1
-        ListeLettreEntrée.append(NouvelleLettre)
-    elif NouvelleLettre not in ListeLettreEntrée:
-        Display, ListeLettreEntrée,Vie = fAjouteur(Mot, NouvelleLettre, 
-                                                      Display, 
-                                                      ListeLettreEntrée,Vie)
-    
-    TexteLettreListe.config(text = ListeLettreEntrée)
+    if NouvelleLettre not in ListeLettreEntrée:
+        if NouvelleLettre not in Mot:
+            Vie -= 1
+            ListeLettreEntrée.append(NouvelleLettre)
+        else:
+            Display, ListeLettreEntrée,Vie = fAjouteur(Mot, NouvelleLettre, 
+                                                          Display, 
+                                                          ListeLettreEntrée,Vie)
+    """Update des afficheurs"""
+    TexteLettreListe.config(text = ListeLettreEntrée)   
     TexteMotADecouvrir.config(text = " ".join(Display))
     TexteNombreVie.config(text = ListeLettreEntrée)
     TexteWinstreak.config(text =str('Winstreak : '+str(Winstreak)))
     TexteNombreVie.config(text = str('Vie : '+str(Vie)))
     
+    """Update des images"""
     if Vie == 8:
         item = CanvasPhoto.create_image(150, 150, image =photo1)
     elif Vie == 7:
@@ -72,14 +79,13 @@ def fTour():
         TexteMotADecouvrir.config(text = " ".join(Mot))
         Winstreak = 0
    
-    #if Display == Mot:
-    #   Winstreak += 1
+    if Display == Mot:
+       Winstreak += 1
    
 def fRejouer():
-    global Mot, Display, ListeLettreEntrée, Vie, Winstreak
-    """Initialisation de la partie"""    
+    """Cette fonction s'occupe d'initialiser et de réinitialiser le programme"""
+    global Mot, Display, ListeLettreEntrée, Vie, Winstreak  
     Mot = random.choice(ListeMot)  #Choisi le mot
-    print(Mot)
     ListeLettreEntrée = []
     
     try:    #C'est moche mais ça permet de détecter s'il s'agit de l'initialisation ou d'un rejouer
@@ -89,7 +95,7 @@ def fRejouer():
     else:
         Display = "_"*len(Mot)
         Display,ListeLettreEntrée,Vie = fAjouteur(Mot, Mot[0], Display, 
-                                                  ListeLettreEntrée, Vie)
+                                                  ListeLettreEntrée, Vie)   #ça aussi c'est pas beau...
         TexteLettreListe.config(text = ListeLettreEntrée)
         TexteMotADecouvrir.config(text = " ".join(Display))
         
@@ -100,9 +106,8 @@ def fRejouer():
     
 
 
-# démarrage :
+#-------------------------Initialisations-------------------------------------#
 Winstreak = 0
-Play = True
 ListeMot = lectureDonnee('Mot_Pendu.csv')
 
 
@@ -114,7 +119,7 @@ fRejouer()
 FenetrePendu = Tk()
 boutonQuitter = Button(FenetrePendu, bg='lightgrey', text = 'Quitter', fg = 'red', command = FenetrePendu.destroy)
 boutonRejouer = Button(FenetrePendu, bg='lightgrey', text = 'Rejouer', command = fRejouer)
-boutonValider = Button(FenetrePendu, bg='lightgrey', text = 'Valider', command = fTour)
+boutonProposer = Button(FenetrePendu, bg='lightgrey', text = 'Proposer', command = fTour)
 
       
 #création de widgets 'Label' et 'Entry' :
@@ -129,7 +134,7 @@ BarreSaisie = Entry(FenetrePendu, textvariable = Saisie)
 
 
     
-# création d'un widget 'Canvas' contenant une image bitmap :
+# création du widget 'Canvas'et importation des images :
 CanvasPhoto = Canvas(FenetrePendu, width =300, height =300, bg ='white')
 photo1 = PhotoImage(file ='Images/bonhomme1.gif')
 photo2 = PhotoImage(file ='Images/bonhomme2.gif')
@@ -154,11 +159,21 @@ BarreSaisie.grid(row =2, column =2,)
 CanvasPhoto.grid(row =1, column =4, rowspan =3, padx =10, pady =5)
 
 boutonQuitter.grid(row =5, column =2)
-boutonValider.grid(row =2, column =3)
+boutonProposer.grid(row =2, column =3)
 boutonRejouer.grid(row =5, column =1)
   
 
 FenetrePendu.title("Jeu du Pendu")
 FenetrePendu.mainloop()
-            
-    
+
+#-------------------------Batch de test---------------------------------------#
+"""
+A chaque fois, toutes les bonnes lettres puis aléatoires
+Mêmes éléments que pour le console :
+Mot = "Myrmecologiste"
+Mot = "Machin"
+Mot = "Test1111" #casse le jeu, normal
+Testé avec +20 mots du document
+
+-> le winstreak marche pas
+"""
