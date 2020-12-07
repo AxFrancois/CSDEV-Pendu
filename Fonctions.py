@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Dec  7 14:16:00 2020
+Created on Sun Nov 30 12:10:36 2020
 
 @author: Axel François
+
+to do : complete
 """
 #-------------------------Import----------------------------------------------#
 import csv
